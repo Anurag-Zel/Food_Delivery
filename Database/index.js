@@ -16,18 +16,20 @@ db.connect()
     .then(() => {
         console.log("Connected to database");
 
-        // Define SQL queries to create tables
+        // Define organisation table
         const createOrganisationTableQuery = `
             CREATE TABLE IF NOT EXISTS organisation (
                 org_id VARCHAR(3) PRIMARY KEY,
                 org_name VARCHAR(100) NOT NULL
             );
         `;
-
+        
+        // Create organisation table
         db.query(createOrganisationTableQuery)
             .then(() => console.log("Organisation table created"))
             .catch((error) => console.error("Error creating Organisation table:", error));
 
+        // Define item table
         const createItemTableQuery = `
             CREATE TABLE IF NOT EXISTS item (
                 item_id VARCHAR(3) PRIMARY KEY,
@@ -36,10 +38,13 @@ db.connect()
             );
         `;
 
+        // Create item table
         db.query(createItemTableQuery)
             .then(() => console.log("Item table created"))
             .catch((error) => console.error("Error creating Item table:", error));
+        
 
+        // Define pricing table
         const createPricingTableQuery = `
             CREATE TABLE IF NOT EXISTS pricing (
                 org_id VARCHAR(3) REFERENCES organisation(org_id),
@@ -52,6 +57,7 @@ db.connect()
             );
         `;
 
+        // Create pricing table
         db.query(createPricingTableQuery)
             .then(() => console.log("Pricing table created"))
             .catch((error) => console.error("Error creating Pricing table:", error));

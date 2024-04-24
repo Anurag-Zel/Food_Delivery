@@ -78,6 +78,7 @@ const calculatePrice = async(req,res) => {
         const response = await db.query("SELECT p.org_id, p.item_id, p.zone, i.item_type, p.base_distance, p.per_km_price, p.fix_price FROM pricing p JOIN item i ON p.item_id = i.item_id WHERE p.zone = $1 AND p.org_id = $2 AND i.item_type = $3", [`${capitalizedZone}`,`${organization_id}`,`${item_type}`]);
         const resultArray = response.rows;
 
+
         for(let i=0; i<resultArray.length; i++){
             if(total_distance <= resultArray[i].base_distance){
                 totalPrice += parseFloat(resultArray[i].fix_price);
