@@ -4,20 +4,62 @@ import pg from "pg";
 dotenv.config();
 
 //Define database
-const db = new pg.Client({
-    user : process.env.POSTGRES_USERNAME,
-    host : "localhost",
-    database : process.env.POSTGRES_DATABASE,
-    password : process.env.POSTGRES_PASSWORD,
-    port : 5432,
+const db = new pg.Pool({
+    connectionString : process.env.POSTGRES_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 //Connect database
-try{
-    db.connect();
-    console.log("Connected to database");
-}catch(error){
-    console.log("Cann't connect to database");
-}
+db.connect()
+    .then(() => {
+        console.log("Connected to database");
+
+        // Define SQL queries to create tables
+        const createOrganisationTableQuery = `
+            CREATE TABLE IF NOT EXISTS organisation (
+                org_id VARCHAR(3) PRIMARY KEY,
+                org_name VARCHAR(100) NOT NULL
+            );
+        `;
+
+        db.query(createOrganisationTableQuery)
+            .then(() => console.log("Organisation table created"))
+            .catch((error) => console.error("Error creating Organisation table:", error));
+
+        const createItemTableQuery = `
+            CREATE TABLE IF NOT EXISTS item (
+                item_id VARCHAR(3) PRIMARY KEY,
+                item_type VARCHAR(20) NOT NULL,
+                item_description VARCHAR(150)
+            );
+        `;
+
+        db.query(createItemTableQuery)
+            .then(() => console.log("Item table created"))
+            .catch((error) => console.error("Error creating Item table:", error));
+
+        const createPricingTableQuery = `
+            CREATE TABLE IF NOT EXISTS pricing (
+                org_id VARCHAR(3) REFERENCES organisation(org_id),
+                item_id VARCHAR(3) REFERENCES item(item_id),
+                zone VARCHAR(50),
+                base_distance INTEGER,
+                per_km_price NUMERIC(8,2),
+                fix_price NUMERIC(8,2),
+                CONSTRAINT pricing_pk PRIMARY KEY (org_id, item_id, zone)
+            );
+        `;
+
+        db.query(createPricingTableQuery)
+            .then(() => console.log("Pricing table created"))
+            .catch((error) => console.error("Error creating Pricing table:", error));
+
+
+    })
+    .catch((error) => {
+        console.error("Error connecting to database:", error);
+    });
 
 export default db;

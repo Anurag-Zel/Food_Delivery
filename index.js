@@ -13,6 +13,10 @@ const port = process.env.PORT;
 //Middlewares
 app.use(bodyParser.json());
 
+app.get("/", (req,res) => {
+    console.log("Running");
+})
+
 //Add new organisation
 app.post("/add/organisation", addOrganisation)
 
